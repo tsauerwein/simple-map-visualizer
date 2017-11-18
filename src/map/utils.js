@@ -1,7 +1,7 @@
 // @flow
 import type {MapConfig, LayerData} from './types';
 
-const MAP_API_URL:string = 'http://documentation.cartodb.com/api/v1/map';
+const MAP_API_URL:string = 'https://documentation.cartodb.com/api/v1/map';
 
 export const checkStatus = (response:Response):Promise<Response> => {
   if (response.status >= 200 && response.status < 300) {
