@@ -1,6 +1,5 @@
 // @flow
 
-import Map from './../map';
 import type {LayerProxy} from './../engines/layerproxy';
 
 /**
@@ -35,10 +34,6 @@ export default class Layer {
    */
   hide() {
     this.layerProxy.hide();
-  }
-
-  setMap(map:Map) {
-    this.map = map;
   }
 
   setProxy(layerProxy:LayerProxy) {

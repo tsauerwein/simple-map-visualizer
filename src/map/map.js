@@ -4,7 +4,9 @@ import type {MapConfig, LayerData} from './types';
 import type {MapProxy} from './engines/mapproxy';
 import {getEngine} from './engines';
 import Layer from './layer';
-import {createLayers, getLayerData} from './layer/utils';
+import TileLayer from './layer/tile';
+import CartoLayer from './layer/carto';
+import {getLayerData, buildBaseUrl} from './layer/utils';
 
 /**
  * This class provides an interface for the user of the
@@ -65,17 +67,35 @@ export default class Map {
   static createMap_(
     mapConfig:MapConfig, layerData:LayerData,
     container:Element, engineType:string) {
-    const engine = getEngine(engineType);
-    const layers = createLayers(mapConfig, layerData);
+    const layers = Map.createLayers_(mapConfig, layerData);
     const mapOptions = {
       zoom: mapConfig.zoom,
       center: mapConfig.center,
       container
     };
 
+    const engine = getEngine(engineType);
     const map = new Map(engine.createMap(mapOptions));
     map.setLayers_(layers);
 
     return map;
+  }
+
+  static createLayers_(mapConfig:MapConfig, layerData:LayerData):Array<Layer> {
+    const userName = mapConfig.maps_api_config.user_name;
+    const baseUrl = buildBaseUrl(layerData, userName);
+
+    const layers = mapConfig.layers.map((layer, i) => {
+      const url = baseUrl.replace('{index}', `${i}`);
+      if (layer.type === 'tiled') {
+        return new TileLayer(url);
+      } else if (layer.type === 'CartoDB') {
+        return new CartoLayer(url, layer, userName);
+      } else {
+        throw new Error(`Unexpected layer type: ${layer.type}`);
+      }
+    });
+
+    return layers;
   }
 }
