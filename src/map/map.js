@@ -1,0 +1,81 @@
+// @flow
+import {getConfig} from './utils';
+import type {MapConfig, LayerData} from './types';
+import type {MapProxy} from './engines/mapproxy';
+import {getEngine} from './engines';
+import Layer from './layer';
+import {createLayers, getLayerData} from './layer/utils';
+
+/**
+ * This class provides an interface for the user of the
+ * library to interact with the internally used mapping
+ * engine.
+ *
+ * @api
+ */
+export default class Map {
+
+  mapProxy:MapProxy;
+  layers:Array<Layer> = [];
+
+  constructor(mapProxy:MapProxy) {
+    this.mapProxy = mapProxy;
+  }
+
+  /**
+   * @api
+   */
+  static init(configUrl:string, container:Element, engine:string = 'leaflet'):Promise<Map> {
+    return getConfig(configUrl)
+      .then((mapConfig:MapConfig) => getLayerData(mapConfig))
+      .then(([layerData, mapConfig]) =>
+        Map.createMap_(mapConfig, layerData, container, engine)
+      );
+  }
+
+  /**
+   * @api
+   */
+  getLayers():Array<Layer> {
+    return this.layers;
+  }
+
+  /**
+   * @api
+   */
+  setZoom(z:number) {
+    this.mapProxy.setZoom(z);
+  }
+
+  /**
+   * @api
+   */
+  getZoom():number {
+    return this.mapProxy.getZoom();
+  }
+
+  setLayers_(layers:Array<Layer>) {
+    this.layers = layers;
+    this.layers.forEach((layer) => {
+      const layerProxy = this.mapProxy.addLayer(layer);
+      layer.setProxy(layerProxy);
+    });
+  }
+
+  static createMap_(
+    mapConfig:MapConfig, layerData:LayerData,
+    container:Element, engineType:string) {
+    const engine = getEngine(engineType);
+    const layers = createLayers(mapConfig, layerData);
+    const mapOptions = {
+      zoom: mapConfig.zoom,
+      center: mapConfig.center,
+      container
+    };
+
+    const map = new Map(engine.createMap(mapOptions));
+    map.setLayers_(layers);
+
+    return map;
+  }
+}
