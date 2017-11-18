@@ -9,21 +9,26 @@ Maps, OpenLayers, ...).
 ### Using as ES 6 module
 
 Example: [src/examples/app.js](src/examples/app.js)
+
 Demo: [https://tsauerwein.github.io/simple-map-visualizer/](https://tsauerwein.github.io/simple-map-visualizer/)
 
-    import {init} from '{yet-to-publish-npm-package}/map';
-    const element = document.getElementById('map');
+```javascript
+import {init} from '{yet-to-publish-npm-package}/map';
+const element = document.getElementById('map');
 
-    init('map-config.json', element).then((map) => {
-      console.log(map.getZoom());
-      ...
-    });
+init('map-config.json', element).then((map) => {
+  console.log(map.getZoom());
+  ...
+});
+```
 
 ### Using included through script tag
 
 Example: [static/global-example.html](static/global-example.html)
+
 Demo: [https://tsauerwein.github.io/simple-map-visualizer/global-example.html](https://tsauerwein.github.io/simple-map-visualizer/global-example.html)
 
+```html
     <script type="text/javascript" src="lib.min.js"></script>
     <script type="text/javascript">
         var element = document.getElementById('map');
@@ -33,6 +38,7 @@ Demo: [https://tsauerwein.github.io/simple-map-visualizer/global-example.html](h
           ...
         });
     </script>
+```
 
 ## Development
 
